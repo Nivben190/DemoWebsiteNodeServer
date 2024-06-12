@@ -1,16 +1,7 @@
 import express, { Request, Response } from 'express';
-import { getDb } from '../../DataAccess/mongo';
+import { UserController } from '../controllers/userController';
+const userController = new UserController();
 const router = express.Router();
-/**
- * @swagger
- * /users:
- *   get:
- *     summary: Get a list of users
- *     description: Retrieve a list of users from the database.
- *     responses:
- *       200:
- *         description: Successful response with a list of users.
- */
 /**
  * @swagger
  * /users/login:
@@ -36,15 +27,13 @@ const router = express.Router();
 
  */
 router.post('/login', async (req: Request, res: Response) => {
-    const db = await getDb();
-    if (!db) {
-        res.status(500).send('Internal server error');
-        return;
+    try
+    {
+       await userController.login(req, res);
     }
-    db.collection('users').findOne({
-        email: req.body.email,
-        password: req.body.password
-    });
+    catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });
 
 /**
@@ -71,13 +60,13 @@ router.post('/login', async (req: Request, res: Response) => {
  *         description: Internal server error
  */
 router.post('/register', async (req: Request, res: Response) => {
-    const db = await getDb();
-    if (!db) {
-        res.status(500).send('Internal server error');
-        return;
+   try
+   {
+       await userController.register(req, res);
+   }
+    catch (error) {
+         res.status(500).json({ error: 'Internal server error' });
     }
-    db.collection('users').insertOne(req.body);
-    res.status(201).send('User created');
 });
 
 export default router;

@@ -5,14 +5,11 @@ import env from '../config/env';
 let db: Db | null = null;
 
   async function connectToMongo(): Promise<Db | null> {
-  console.log('Connecting to MongoDB');
   if (db) {
     return db;
   }
 
   try {
-    console.log(env.MONGODB_URI);
-    
     const client = await MongoClient.connect(env.MONGODB_URI);
     db = client.db("demo"); 
     console.log('Connected to MongoDB');

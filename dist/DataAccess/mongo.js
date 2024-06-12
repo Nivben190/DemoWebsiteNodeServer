@@ -49,14 +49,12 @@ function connectToMongo() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    console.log('Connecting to MongoDB');
                     if (db) {
                         return [2 /*return*/, db];
                     }
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
-                    console.log(env_1.default.MONGODB_URI);
                     return [4 /*yield*/, mongodb_1.MongoClient.connect(env_1.default.MONGODB_URI)];
                 case 2:
                     client = _a.sent();

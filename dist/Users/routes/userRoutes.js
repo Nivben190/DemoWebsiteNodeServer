@@ -40,18 +40,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
-var mongo_1 = require("../../DataAccess/mongo");
+var userController_1 = require("../controllers/userController");
+var userController = new userController_1.UserController();
 var router = express_1.default.Router();
-/**
- * @swagger
- * /users:
- *   get:
- *     summary: Get a list of users
- *     description: Retrieve a list of users from the database.
- *     responses:
- *       200:
- *         description: Successful response with a list of users.
- */
 /**
  * @swagger
  * /users/login:
@@ -77,21 +68,20 @@ var router = express_1.default.Router();
 
  */
 router.post('/login', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var db;
+    var error_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, (0, mongo_1.getDb)()];
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, userController.login(req, res)];
             case 1:
-                db = _a.sent();
-                if (!db) {
-                    res.status(500).send('Internal server error');
-                    return [2 /*return*/];
-                }
-                db.collection('users').findOne({
-                    email: req.body.email,
-                    password: req.body.password
-                });
-                return [2 /*return*/];
+                _a.sent();
+                return [3 /*break*/, 3];
+            case 2:
+                error_1 = _a.sent();
+                res.status(500).json({ error: 'Internal server error' });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
     });
 }); });
@@ -119,19 +109,20 @@ router.post('/login', function (req, res) { return __awaiter(void 0, void 0, voi
  *         description: Internal server error
  */
 router.post('/register', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var db;
+    var error_2;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, (0, mongo_1.getDb)()];
+            case 0:
+                _a.trys.push([0, 2, , 3]);
+                return [4 /*yield*/, userController.register(req, res)];
             case 1:
-                db = _a.sent();
-                if (!db) {
-                    res.status(500).send('Internal server error');
-                    return [2 /*return*/];
-                }
-                db.collection('users').insertOne(req.body);
-                res.status(201).send('User created');
-                return [2 /*return*/];
+                _a.sent();
+                return [3 /*break*/, 3];
+            case 2:
+                error_2 = _a.sent();
+                res.status(500).json({ error: 'Internal server error' });
+                return [3 /*break*/, 3];
+            case 3: return [2 /*return*/];
         }
     });
 }); });

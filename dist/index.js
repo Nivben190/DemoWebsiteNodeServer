@@ -41,7 +41,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
 var cors_1 = __importDefault(require("cors"));
-var morgan_1 = __importDefault(require("morgan"));
 var mongo_1 = require("./DataAccess/mongo");
 var userRoutes_1 = __importDefault(require("./Users/routes/userRoutes"));
 var swaggerUi = require('swagger-ui-express');
@@ -52,7 +51,6 @@ app.use((0, cors_1.default)({
     origin: 'http://localhost:3000/' // replace with your client's URL
 }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.use((0, morgan_1.default)('dev'));
 app.use(express_1.default.json());
 app.use('/users', userRoutes_1.default);
 function startServer() {
