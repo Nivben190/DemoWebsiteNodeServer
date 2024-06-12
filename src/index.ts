@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { getDb } from './DataAccess/mongo';
 import userRoutes from './Users/routes/userRoutes';
+import imagesRoutes from './Images/routes/imagesRoutes';
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors({
 
   
   app.use(express.json());
+  app.use('/images', imagesRoutes);
 app.use('/users', userRoutes);
 
 async function startServer () {

@@ -43,6 +43,7 @@ var express_1 = __importDefault(require("express"));
 var cors_1 = __importDefault(require("cors"));
 var mongo_1 = require("./DataAccess/mongo");
 var userRoutes_1 = __importDefault(require("./Users/routes/userRoutes"));
+var imagesRoutes_1 = __importDefault(require("./Images/routes/imagesRoutes"));
 var swaggerUi = require('swagger-ui-express');
 var swaggerSpec = require('./config/swagger');
 var app = (0, express_1.default)();
@@ -52,6 +53,7 @@ app.use((0, cors_1.default)({
 }));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(express_1.default.json());
+app.use('/images', imagesRoutes_1.default);
 app.use('/users', userRoutes_1.default);
 function startServer() {
     return __awaiter(this, void 0, void 0, function () {

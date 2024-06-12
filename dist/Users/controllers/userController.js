@@ -38,62 +38,88 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 var userService_1 = require("../services/userService");
+var loginHelper_1 = require("../utils/loginHelper");
+var mongoDbLoggerService_1 = require("../../loggers/mongoDbLoggerService");
 var UserController = /** @class */ (function () {
     function UserController() {
+        this.errorLoggerService = new mongoDbLoggerService_1.ErrorLoggerService();
     }
     UserController.prototype.register = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, email, password, loginArgs, user, error_1;
+            var _a, email, password, error, log, Args, user, error_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        _b.trys.push([0, 2, , 3]);
+                        _b.trys.push([0, 4, , 6]);
                         _a = req.body, email = _a.email, password = _a.password;
-                        if (!email || !password) {
-                            res.status(400).json({ error: 'Username and password are required' });
-                            return [2 /*return*/];
-                        }
-                        loginArgs = { email: email, password: password };
-                        return [4 /*yield*/, (0, userService_1.registerUser)(loginArgs)];
+                        error = (0, loginHelper_1.validate)(email, password);
+                        if (!error) return [3 /*break*/, 2];
+                        log = {
+                            message: 'Invalid email or password',
+                            error: error,
+                            metaData: { email: email, password: password }
+                        };
+                        return [4 /*yield*/, this.errorLoggerService.logError(log)];
                     case 1:
+                        _b.sent();
+                        res.status(400).json({ error: error });
+                        return [2 /*return*/];
+                    case 2:
+                        Args = { email: email, password: password };
+                        return [4 /*yield*/, (0, userService_1.registerUser)(Args)];
+                    case 3:
                         user = _b.sent();
                         res.status(201).json({ message: 'User registered successfully', user: user });
-                        return [3 /*break*/, 3];
-                    case 2:
+                        return [3 /*break*/, 6];
+                    case 4:
                         error_1 = _b.sent();
+                        return [4 /*yield*/, this.errorLoggerService.logError(error_1)];
+                    case 5:
+                        _b.sent();
                         res.status(500).json({ error: 'Internal server error' });
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/];
+                        return [3 /*break*/, 6];
+                    case 6: return [2 /*return*/];
                 }
             });
         });
     };
     UserController.prototype.login = function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, email, password, isLogin, error_2;
+            var _a, email, password, error, log, user, error_2;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
-                        _b.trys.push([0, 2, , 3]);
+                        _b.trys.push([0, 4, , 6]);
                         _a = req.body, email = _a.email, password = _a.password;
-                        if (!email || !password) {
-                            res.status(400).json({ error: 'Username and password are required' });
-                            return [2 /*return*/];
-                        }
-                        return [4 /*yield*/, (0, userService_1.findUserByEmailAndPassword)(email, password)];
+                        error = (0, loginHelper_1.validate)(email, password);
+                        if (!error) return [3 /*break*/, 2];
+                        log = {
+                            message: 'Invalid email or password',
+                            error: error,
+                            metaData: { email: email, password: password }
+                        };
+                        return [4 /*yield*/, this.errorLoggerService.logError(log)];
                     case 1:
-                        isLogin = _b.sent();
-                        if (!isLogin) {
+                        _b.sent();
+                        res.status(400).json({ error: error });
+                        return [2 /*return*/];
+                    case 2: return [4 /*yield*/, (0, userService_1.findUserByEmailAndPassword)(email, password)];
+                    case 3:
+                        user = _b.sent();
+                        if (!user) {
                             res.status(401).json({ error: 'Invalid username or password' });
                             return [2 /*return*/];
                         }
-                        res.status(200).json({ message: 'User logged in successfully', isLogin: isLogin });
-                        return [3 /*break*/, 3];
-                    case 2:
+                        res.status(200).json({ message: 'User logged in successfully', user: user });
+                        return [3 /*break*/, 6];
+                    case 4:
                         error_2 = _b.sent();
+                        return [4 /*yield*/, this.errorLoggerService.logError(error_2)];
+                    case 5:
+                        _b.sent();
                         res.status(500).json({ error: 'Internal server error' });
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/];
+                        return [3 /*break*/, 6];
+                    case 6: return [2 /*return*/];
                 }
             });
         });
