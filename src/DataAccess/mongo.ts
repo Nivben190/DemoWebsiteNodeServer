@@ -1,19 +1,30 @@
-import { MongoClient } from 'mongodb';
+import { Db, MongoClient } from 'mongodb';
 import env from '../config/env';
-const dbName = 'your-database-name';
-
-async  function connectToMongo() {
-    try {
-        const client = await MongoClient.connect(env.MONGODB_URI);
-        const db = client.db(dbName);
-        console.log('Connected to MongoDB');
-        return db;
-    } catch (error) {
-        console.error('Error connecting to MongoDB:', error);
-    }
-}
-
-const db = connectToMongo();
 
 
-export default db;
+let db: Db | null = null;
+
+  async function connectToMongo(): Promise<Db | null> {
+  console.log('Connecting to MongoDB');
+  if (db) {
+    return db;
+  }
+
+  try {
+    const client = await MongoClient.connect(env.MONGODB_URI);
+    db = client.db("demo"); 
+    console.log('Connected to MongoDB');
+    return db;
+  } catch (error) {
+    console.error('Error connecting to MongoDB:', error);
+    return null;
+  }
+};
+
+export async function getDb() {
+  if (!db) {
+    await connectToMongo();
+  }
+  return db;
+};
+
