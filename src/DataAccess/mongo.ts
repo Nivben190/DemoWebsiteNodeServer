@@ -11,6 +11,8 @@ let db: Db | null = null;
   }
 
   try {
+    console.log(env.MONGODB_URI);
+    
     const client = await MongoClient.connect(env.MONGODB_URI);
     db = client.db("demo"); 
     console.log('Connected to MongoDB');

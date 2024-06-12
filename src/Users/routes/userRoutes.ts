@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { getDb } from '../../DataAccess/mongo.ts';
+import { getDb } from '../../DataAccess/mongo';
 const router = express.Router();
 /**
  * @swagger

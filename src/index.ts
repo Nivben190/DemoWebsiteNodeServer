@@ -1,8 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import { getDb } from './DataAccess/mongo.ts';
-import userRoutes from './Users/routes/userRoutes.ts';
+import { getDb } from './DataAccess/mongo';
+import userRoutes from './Users/routes/userRoutes';
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 const app = express();
