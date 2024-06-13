@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const mongoProductionLogger_1 = require("./loggers/mongoProductionLogger");
-const mongo_1 = require("./DataAccess/mongo");
+const elasticSearchLogger_1 = require("./loggers/elasticSearchLogger");
 const userRoutes_1 = __importDefault(require("./Users/routes/userRoutes"));
 const imagesRoutes_1 = __importDefault(require("./Images/routes/imagesRoutes"));
 const swaggerUi = require('swagger-ui-express');
@@ -22,15 +22,17 @@ app.use(express_1.default.json());
 app.use('/images', imagesRoutes_1.default);
 app.use('/users', userRoutes_1.default);
 async function startServer() {
-    const logger = await prodLogger;
+    //const logger = await prodLogger as Logger;
+    const elasticLogger = (0, elasticSearchLogger_1.createElasticLogger)();
     try {
-        await (0, mongo_1.getDb)();
+        //await getDb();
         app.listen(port, () => {
-            logger.info(`Server running on port ${port}`);
+            elasticLogger.info('Some log message');
+            //logger.info(`Server running on port ${port}`);
         });
     }
     catch (error) {
-        logger.error(`Error starting server: ${error}`, error);
+        //logger.error(`Error starting server: ${error}`, error);
     }
 }
 ;

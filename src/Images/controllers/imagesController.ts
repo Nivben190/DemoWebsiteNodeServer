@@ -1,12 +1,9 @@
 import { Request, Response } from 'express';
 import { getImages, uploadImage ,deleteImage} from '../services/imagesService';
 import { createProductionLogger } from "../../loggers/mongoProductionLogger";
-import { Logger } from 'winston';
 
 export class ImagesController {
     constructor() {
-
-
     }
     public async getImages(req: Request, res: Response): Promise<void> {
         const logger = await createProductionLogger();
