@@ -1,6 +1,6 @@
 "use strict";
-var swaggerJSDoc = require('swagger-jsdoc');
-var options = {
+const swaggerJSDoc = require('swagger-jsdoc');
+const options = {
     definition: {
         openapi: '3.0.0',
         info: {
@@ -11,5 +11,5 @@ var options = {
     },
     apis: ['./src/Users/routes/*.ts', './src/Images/routes/*.ts'],
 };
-var swaggerSpec = swaggerJSDoc(options);
+const swaggerSpec = swaggerJSDoc(options);
 module.exports = swaggerSpec;

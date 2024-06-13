@@ -4,16 +4,13 @@ import env from "../../config/env";
 
 const { BlobServiceClient } = require("@azure/storage-blob");
 const { v1: uuidv1 } = require("uuid");
-const { DefaultAzureCredential } = require('@azure/identity');
 const blobServiceClient = BlobServiceClient.fromConnectionString(env.AZURE_STORAGE_CONNECTION_STRING);
 const containerClient = blobServiceClient.getContainerClient(env.AZURE_STORAGE_CONTAINER_NAME);
 
- var containerUrl = `${env.AZURE_STORAGE_CONNECTION_STRING}/${env.AZURE_STORAGE_CONTAINER_NAME}`;
 export async function getImages(): Promise<any> {
     const images = [];
     for await (const blob of containerClient.listBlobsFlat()) {
         const tempBlockBlobClient = containerClient.getBlockBlobClient(blob.name);
-
         const image = {
             name: blob.name,
             url: `${tempBlockBlobClient.url}`
@@ -27,7 +24,7 @@ export async function getImages(): Promise<any> {
 export async function uploadImage(image: any) {
     const blobName = uuidv1() + '.jpg';
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-    const uploadBlobResponse = await blockBlobClient.uploadFile(image.filepath)
+     await blockBlobClient.uploadFile(image.filepath)
     return blobName;
 }
 

@@ -17,14 +17,14 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "formidable": "^3.5.1",
-    "loggy": "^1.0.8",
     "mongodb": "^6.7.0",
     "morgan": "^1.10.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "uuid": "^10.0.0",
     "winston": "^3.13.0",
-    "winston-elasticsearch": "^0.19.0"
+    "winston-elasticsearch": "^0.19.0",
+    "winston-mongodb": "^5.1.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

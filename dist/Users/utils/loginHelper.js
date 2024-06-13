@@ -4,12 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validate = void 0;
-var Errors_1 = __importDefault(require("../../errors/Errors"));
+const Errors_1 = __importDefault(require("../../errors/Errors"));
 function checkPasswordLength(password) {
     return password.length > 5 && password.length < 21;
 }
 function validateEmail(email) {
-    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
 }
 function validate(email, password) {
