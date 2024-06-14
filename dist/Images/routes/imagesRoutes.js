@@ -20,7 +20,7 @@ const formidable = require('formidable');
  *       500:
  *         description: Internal server error
  */
-router.get('/', async (req, res) => {
+router.get('/getallimages', async (req, res) => {
     try {
         const images = await imagesController.getImages(req, res);
         res.status(200).json(images);
@@ -40,12 +40,14 @@ router.get('/', async (req, res) => {
  *       required: true
  *       content:
  *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               image:
- *                 type: string
- *                 format: binary
+ *            schema:
+*             type: object
+*             properties:
+*               image:
+*                 type: string
+*                 format: binary
+*               title:
+*                 type: string
  *     responses:
  *       201:
  *         description: Image uploaded
@@ -56,6 +58,8 @@ router.post('/upload', async (req, res) => {
     const form = new formidable.IncomingForm();
     form.parse(req, async function (err, fields, files) {
         const file = files.image[0];
+        const title = fields.title[0];
+        file.title = title;
         try {
             await imagesController.uploadImage(file, res);
             res.status(201).json({ message: 'Image uploaded' });
@@ -82,6 +86,39 @@ router.delete('/delete', async (req, res) => {
     try {
         await imagesController.deleteImage(req, res);
         res.status(200).json({ message: 'Image deleted' });
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+/**
+ * @swagger
+ * /images/like:
+ *   post:
+ *     summary: Like image
+ *     description: Like an image.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               imageId:
+ *                 type: string
+ *             required:
+ *               - imageId
+ *     responses:
+ *       200:
+ *         description: Image liked
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/like', async (req, res) => {
+    try {
+        const imageId = req.body.imageId;
+        const objectId = await imagesController.likeImage(imageId, res);
+        res.status(200).json(objectId);
     }
     catch (error) {
         res.status(500).json({ error: 'Internal server error' });

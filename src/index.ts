@@ -12,7 +12,7 @@ const port = 3000;
 const prodLogger = createProductionLogger();
 
 app.use(cors({
-    origin: 'http://localhost:3000/' // replace with your client's URL
+    origin: 'http://localhost:4200' // replace with your client's URL
   }));
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

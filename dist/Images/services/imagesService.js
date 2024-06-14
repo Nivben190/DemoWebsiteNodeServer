@@ -1,54 +1,52 @@
 "use strict";
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteImage = exports.uploadImage = exports.getImages = void 0;
+exports.deleteImage = exports.likeImage = exports.uploadImage = exports.getImages = void 0;
 const env_1 = __importDefault(require("../../config/env"));
+const mongo_1 = require("../../DataAccess/mongo");
+const mongodb_1 = require("mongodb"); // Ensure this import is at the top of your file
 const { BlobServiceClient } = require("@azure/storage-blob");
 const { v1: uuidv1 } = require("uuid");
 const blobServiceClient = BlobServiceClient.fromConnectionString(env_1.default.AZURE_STORAGE_CONNECTION_STRING);
 const containerClient = blobServiceClient.getContainerClient(env_1.default.AZURE_STORAGE_CONTAINER_NAME);
 async function getImages() {
-    var _a, e_1, _b, _c;
-    const images = [];
-    try {
-        for (var _d = true, _e = __asyncValues(containerClient.listBlobsFlat()), _f; _f = await _e.next(), _a = _f.done, !_a; _d = true) {
-            _c = _f.value;
-            _d = false;
-            const blob = _c;
-            const tempBlockBlobClient = containerClient.getBlockBlobClient(blob.name);
-            const image = {
-                name: blob.name,
-                url: `${tempBlockBlobClient.url}`
-            };
-            images.push(image);
-        }
-    }
-    catch (e_1_1) { e_1 = { error: e_1_1 }; }
-    finally {
-        try {
-            if (!_d && !_a && (_b = _e.return)) await _b.call(_e);
-        }
-        finally { if (e_1) throw e_1.error; }
-    }
-    return images;
+    var db = await (0, mongo_1.getDb)();
+    const collection = db === null || db === void 0 ? void 0 : db.collection('images');
+    return await (collection === null || collection === void 0 ? void 0 : collection.find({}).toArray());
 }
 exports.getImages = getImages;
 async function uploadImage(image) {
     const blobName = uuidv1() + '.jpg';
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
     await blockBlobClient.uploadFile(image.filepath);
+    addImageToDb({ url: blockBlobClient.url, title: image.title });
     return blobName;
 }
 exports.uploadImage = uploadImage;
+async function addImageToDb(imageData) {
+    const imageDTO = {
+        url: imageData.url,
+        likes: 0,
+        title: imageData.title
+    };
+    var db = await (0, mongo_1.getDb)();
+    const collection = db === null || db === void 0 ? void 0 : db.collection('images');
+    await (collection === null || collection === void 0 ? void 0 : collection.insertOne(imageDTO));
+    return;
+}
+async function likeImage(imageId) {
+    var db = await (0, mongo_1.getDb)();
+    const collection = db === null || db === void 0 ? void 0 : db.collection('images');
+    const objectId = new mongodb_1.ObjectId(imageId);
+    const image = await (collection === null || collection === void 0 ? void 0 : collection.findOne({ _id: objectId }));
+    if (image) {
+        await (collection === null || collection === void 0 ? void 0 : collection.updateOne({ _id: objectId }, { $set: { likes: image.likes + 1 } }));
+    }
+    return objectId;
+}
+exports.likeImage = likeImage;
 async function deleteImage(imageId) {
     const blockBlobClient = containerClient.getBlockBlobClient(imageId);
     await blockBlobClient.delete();
