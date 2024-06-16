@@ -40,6 +40,7 @@ export async function likeImage(imageId: number): Promise<any> {
     const collection = db?.collection('images');
     const objectId = new ObjectId(imageId);
     const image = await collection?.findOne ({_id: objectId});
+    
     if (image) {
         await collection?.updateOne({_id: objectId}, {$set: {likes: image.likes + 1}});
     }

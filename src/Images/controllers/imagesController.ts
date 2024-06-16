@@ -19,6 +19,7 @@ export class ImagesController {
         const logger = await createProductionLogger();
 
         try {
+         
               await uploadImage(imageFile);
         } catch (error) {
             logger.error('Error uploading image', error);
