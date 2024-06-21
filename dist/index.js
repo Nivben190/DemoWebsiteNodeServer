@@ -14,9 +14,8 @@ const swaggerSpec = require('./config/swagger');
 const app = (0, express_1.default)();
 const port = 3000;
 const prodLogger = (0, mongoProductionLogger_1.createProductionLogger)();
-app.use((0, cors_1.default)({
-    origin: 'http://localhost:4200' // replace with your client's URL
-}));
+//all cors origin
+app.use((0, cors_1.default)());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(express_1.default.json());
 app.use('/images', imagesRoutes_1.default);

@@ -11,9 +11,9 @@ const app = express();
 const port = 3000;
 const prodLogger = createProductionLogger();
 
-app.use(cors({
-    origin: 'http://localhost:4200' // replace with your client's URL
-  }));
+//all cors origin
+ 
+app.use(cors());
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(express.json());
