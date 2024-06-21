@@ -27,3 +27,7 @@ export async function getDb() {
   return db;
 };
 
+export function getDbUrl(){
+  return `${env.MONGODB_URI}demo`;
+}
+
