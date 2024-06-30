@@ -6,6 +6,17 @@ const mongoProductionLogger_1 = require("../../loggers/mongoProductionLogger");
 class ImagesController {
     constructor() {
     }
+    async getLazyLoadingImages(req, res) {
+        const logger = await (0, mongoProductionLogger_1.createProductionLogger)();
+        try {
+            const images = await (0, imagesService_1.getLazyLoadingImages)(req.body);
+            return images;
+        }
+        catch (error) {
+            logger.error('Error getting images', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
     async getImages(req, res) {
         const logger = await (0, mongoProductionLogger_1.createProductionLogger)();
         try {
