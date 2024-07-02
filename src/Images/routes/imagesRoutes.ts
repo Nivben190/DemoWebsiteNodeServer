@@ -10,7 +10,7 @@ const formidable = require('formidable');
 /**
  * @swagger
  * /images/lazyloading:
- *   get:
+ *   post:
  *     summary: Get lazy loading images
  *     requestBody:
  *       required: true
