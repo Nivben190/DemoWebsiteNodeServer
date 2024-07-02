@@ -15,6 +15,14 @@ export async function getImages(): Promise<any> {
     return await collection?.find({}).toArray();
 }
 
+export async function getLazyLoadingImages(lazyLoadingArgs: any): Promise<any> {
+    var db = await getDb();
+    const firstIndex = lazyLoadingArgs.firstIndex;
+    const skipIndex = lazyLoadingArgs.skipIndex;
+    const collection = db?.collection('images');
+    return await collection?.find({}).skip(firstIndex).limit(skipIndex).toArray();
+}
+
 
 export async function uploadImage(image: any) {
     const blobName = uuidv1() + '.jpg';

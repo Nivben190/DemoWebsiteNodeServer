@@ -4,6 +4,41 @@ const router = express.Router();
 const imagesController = new ImagesController();
 const formidable = require('formidable');
 
+
+
+//lazy loading images 
+/**
+ * @swagger
+ * /images/lazyloading:
+ *   post:
+ *     summary: Get lazy loading images
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstIndex:
+ *                 type: number
+ *               skipIndex:
+ *                 type: number
+ *     responses:
+ *       200:
+ *         description: Successful retrieval of images
+ *       500:
+ *         description: Server error
+ */
+router.post('/lazyloading', async (req: Request, res: Response) => {
+    try {
+        const images = await imagesController.getLazyLoadingImages(req, res);
+        res.status(200).json(images);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+);
+
 /**
  * @swagger
  * /images:
