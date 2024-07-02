@@ -63,6 +63,42 @@ router.get('/getallimages', async (req: Request, res: Response) => {
 }
 );
 
+
+//get images by section
+/**
+ * @swagger
+ * /images/getBySection:
+ *   post:
+ *     summary: Get images by section
+ *     description: Get images by section.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               section:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful retrieval of images
+ *       500:
+ *         description: Internal server error
+ */
+
+
+router.post('/getBySection', async (req: Request, res: Response) => {
+    try {
+       const images =  await imagesController.getImagesBySection(req, res);
+       
+        res.status(200).json(images);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+);
+
 //upload 
 /**
  * @swagger
@@ -82,6 +118,8 @@ router.get('/getallimages', async (req: Request, res: Response) => {
 *                 format: binary
 *               title:
 *                 type: string
+*               container:
+*                 type: string
  *     responses:
  *       201:
  *         description: Image uploaded
@@ -95,9 +133,10 @@ router.post('/upload', async (req: Request, res: Response) => {
     form.parse(req, async function (err :any, fields :any, files :any) {
         const file = files.image[0] ;
          const title = fields.title[0]; 
+         const container = fields.container[0];
          file.title = title;
         try {
-            await imagesController.uploadImage(file,res);
+            await imagesController.uploadImage(file,res,container);
             res.status(201).json({ message: 'Image uploaded' });
         } catch (error) {
             res.status(500).json({ error: 'Internal server error' });

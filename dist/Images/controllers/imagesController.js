@@ -28,10 +28,22 @@ class ImagesController {
             res.status(500).json({ error: 'Internal server error' });
         }
     }
-    async uploadImage(imageFile, res) {
+    async getImagesBySection(req, res) {
         const logger = await (0, mongoProductionLogger_1.createProductionLogger)();
         try {
-            await (0, imagesService_1.uploadImage)(imageFile);
+            const section = req.body.section;
+            const images = await (0, imagesService_1.getImagesBySection)(section);
+            return images;
+        }
+        catch (error) {
+            logger.error('Error getting images', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+    async uploadImage(imageFile, res, container) {
+        const logger = await (0, mongoProductionLogger_1.createProductionLogger)();
+        try {
+            await (0, imagesService_1.uploadImage)(imageFile, container);
         }
         catch (error) {
             logger.error('Error uploading image', error);

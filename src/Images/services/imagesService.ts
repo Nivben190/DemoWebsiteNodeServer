@@ -15,6 +15,12 @@ export async function getImages(): Promise<any> {
     return await collection?.find({}).toArray();
 }
 
+export async function getImagesBySection(section: string): Promise<any> {
+    var db = await getDb();
+    const collection = db?.collection('images');
+    return await collection?.find({section: section}).toArray();
+}
+
 export async function getLazyLoadingImages(lazyLoadingArgs: any): Promise<any> {
     var db = await getDb();
     const firstIndex = lazyLoadingArgs.firstIndex;
@@ -24,18 +30,19 @@ export async function getLazyLoadingImages(lazyLoadingArgs: any): Promise<any> {
 }
 
 
-export async function uploadImage(image: any) {
+export async function uploadImage(image: any,container:string | undefined) {
     const blobName = uuidv1() + '.jpg';
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
     await blockBlobClient.uploadFile(image.filepath)
-    addImageToDb({url: blockBlobClient.url, title: image.title});
+    addImageToDb({url: blockBlobClient.url, title: image.title, section: container});
     return blobName;
 }
  async function addImageToDb(imageData: any) {
      const imageDTO ={
             url: imageData.url,
             likes: 0,
-            title: imageData.title
+            title: imageData.title,
+            section: imageData.section
      }
      var db = await getDb();
     const collection = db?.collection('images');

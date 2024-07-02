@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteImage = exports.likeImage = exports.uploadImage = exports.getLazyLoadingImages = exports.getImages = void 0;
+exports.deleteImage = exports.likeImage = exports.uploadImage = exports.getLazyLoadingImages = exports.getImagesBySection = exports.getImages = void 0;
 const env_1 = __importDefault(require("../../config/env"));
 const mongo_1 = require("../../DataAccess/mongo");
 const mongodb_1 = require("mongodb"); // Ensure this import is at the top of your file
@@ -17,6 +17,12 @@ async function getImages() {
     return await (collection === null || collection === void 0 ? void 0 : collection.find({}).toArray());
 }
 exports.getImages = getImages;
+async function getImagesBySection(section) {
+    var db = await (0, mongo_1.getDb)();
+    const collection = db === null || db === void 0 ? void 0 : db.collection('images');
+    return await (collection === null || collection === void 0 ? void 0 : collection.find({ section: section }).toArray());
+}
+exports.getImagesBySection = getImagesBySection;
 async function getLazyLoadingImages(lazyLoadingArgs) {
     var db = await (0, mongo_1.getDb)();
     const firstIndex = lazyLoadingArgs.firstIndex;
@@ -25,11 +31,11 @@ async function getLazyLoadingImages(lazyLoadingArgs) {
     return await (collection === null || collection === void 0 ? void 0 : collection.find({}).skip(firstIndex).limit(skipIndex).toArray());
 }
 exports.getLazyLoadingImages = getLazyLoadingImages;
-async function uploadImage(image) {
+async function uploadImage(image, container) {
     const blobName = uuidv1() + '.jpg';
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
     await blockBlobClient.uploadFile(image.filepath);
-    addImageToDb({ url: blockBlobClient.url, title: image.title });
+    addImageToDb({ url: blockBlobClient.url, title: image.title, section: container });
     return blobName;
 }
 exports.uploadImage = uploadImage;
