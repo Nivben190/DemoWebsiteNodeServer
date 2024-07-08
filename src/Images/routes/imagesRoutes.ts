@@ -3,8 +3,7 @@ import { ImagesController } from '../controllers/imagesController';
 const router = express.Router();
 const imagesController = new ImagesController();
 const formidable = require('formidable');
-
-
+import multer from 'multer';
 
 //lazy loading images 
 /**
@@ -32,30 +31,6 @@ const formidable = require('formidable');
 router.post('/lazyloading', async (req: Request, res: Response) => {
     try {
         const images = await imagesController.getLazyLoadingImages(req, res);
-        res.status(200).json(images);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
-}
-);
-
-/**
- * @swagger
- * /images:
- *   get:
- *     summary: Get all images
- *     description: Get all images.
- *     responses:
- *       200:
- *         description: Successful retrieval of images
- *       500:
- *         description: Internal server error
- */
-
-router.get('/getallimages', async (req: Request, res: Response) => {
-    try {
-       const images =  await imagesController.getImages(req, res);
-       
         res.status(200).json(images);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
@@ -118,32 +93,46 @@ router.post('/getBySection', async (req: Request, res: Response) => {
 *                 format: binary
 *               title:
 *                 type: string
-*               container:
+*               collection:
 *                 type: string
  *     responses:
- *       201:
+ *       200:
  *         description: Image uploaded
  *       500:
  *         description: Internal server error
  */
 
-router.post('/upload', async (req: Request, res: Response) => {
+const upload = multer({ storage: multer.memoryStorage() });
+router.post('/upload', upload.single('image'), async (req: Request, res: Response) => {
+    try {
+        const { title, collection } = req.body;
+        const data = { file: req.file, title, collection };
 
-    const form = new formidable.IncomingForm();
-    form.parse(req, async function (err :any, fields :any, files :any) {
-        const file = files.image[0] ;
-         const title = fields.title[0]; 
-         const container = fields.container[0];
-         file.title = title;
-        try {
-            await imagesController.uploadImage(file,res,container);
-            res.status(201).json({ message: 'Image uploaded' });
-        } catch (error) {
-            res.status(500).json({ error: 'Internal server error' });
-        }
-      });
+        imagesController.uploadImage(data);
+        res.status(200).json({ message: 'Image uploaded' });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+);
+
+// router.post('/upload', async (req: Request, res: Response) => {
+
+//     const form = new formidable.IncomingForm();
+//     form.parse(req, async function (err :any, fields :any, files :any) {
+//         const file = files.image[0] ;
+//          const title = fields.title[0]; 
+//          const container = fields.container[0];
+//          file.title = title;
+//         try {
+//             await imagesController.uploadImage(file,res,container);
+//             res.status(201).json({ message: 'Image uploaded' });
+//         } catch (error) {
+//             res.status(500).json({ error: 'Internal server error' });
+//         }
+//       });
         
-    });
+//     });
 //delete
 /**
  * @swagger
