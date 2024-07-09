@@ -68,7 +68,7 @@ export async function getImagesByCollectionName(collectionName: string): Promise
 export async function getLazyLoadingImagesFroDb(lazyLoadingArgs: any): Promise<any> {
     const firstIndex = lazyLoadingArgs.firstIndex;
     const skipIndex = lazyLoadingArgs.skipIndex;
-    const querySnapshot = await getDocs(collection(db, 'images'));
+    const querySnapshot = await getDocs(collection(db, 'gallery'));
     const images = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data()
