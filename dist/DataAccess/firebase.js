@@ -55,7 +55,7 @@ exports.deleteImageById = deleteImageById;
 async function getImagesByCollectionName(collectionName) {
     try {
         const querySnapshot = await (0, firestore_1.getDocs)((0, firestore_1.collection)(db, collectionName));
-        const images = querySnapshot.docs.map((doc) => doc.data());
+        const images = querySnapshot.docs.map((doc) => (Object.assign({ id: doc.id }, doc.data())));
         return images;
     }
     catch (e) {
@@ -66,8 +66,8 @@ exports.getImagesByCollectionName = getImagesByCollectionName;
 async function getLazyLoadingImagesFroDb(lazyLoadingArgs) {
     const firstIndex = lazyLoadingArgs.firstIndex;
     const skipIndex = lazyLoadingArgs.skipIndex;
-    const querySnapshot = await (0, firestore_1.getDocs)((0, firestore_1.collection)(db, 'images'));
-    const images = querySnapshot.docs.map((doc) => doc.data());
+    const querySnapshot = await (0, firestore_1.getDocs)((0, firestore_1.collection)(db, 'gallery'));
+    const images = querySnapshot.docs.map((doc) => (Object.assign({ id: doc.id }, doc.data())));
     return images.slice(firstIndex, skipIndex);
 }
 exports.getLazyLoadingImagesFroDb = getLazyLoadingImagesFroDb;
