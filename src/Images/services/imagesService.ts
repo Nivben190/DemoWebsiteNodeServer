@@ -1,5 +1,4 @@
 
-import { getDb } from '../../DataAccess/mongo';
 import { getStorage,ref,getDownloadURL,uploadBytesResumable } from "firebase/storage"; // Corrected import for getStorage
 import { deleteImageById, firebaseConfig, getImagesByCollectionName, getLazyLoadingImagesFroDb } from "../../DataAccess/firebase";
 import { likeImageById } from '../../DataAccess/firebase';
