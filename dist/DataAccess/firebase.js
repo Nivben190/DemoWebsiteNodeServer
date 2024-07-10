@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getLazyLoadingImagesFroDb = exports.getImagesByCollectionName = exports.deleteImageById = exports.likeImageById = exports.add = exports.firebaseConfig = void 0;
+exports.getLazyLoadingImagesFroDb = exports.getImagesByCollectionName = exports.deleteImageById = exports.updateImageById = exports.likeImageById = exports.add = exports.firebaseConfig = void 0;
 // Import the functions you need from the SDKs you need
 const app_1 = require("firebase/app");
 const firestore_1 = require("firebase/firestore");
@@ -42,9 +42,21 @@ async function likeImageById(imageId) {
     }
 }
 exports.likeImageById = likeImageById;
-async function deleteImageById(imageId) {
+async function updateImageById(imageId, data) {
     try {
-        const docRef = (0, firestore_2.doc)(db, 'images', imageId);
+        var collection = data.collection;
+        const docRef = (0, firestore_2.doc)(db, collection, imageId);
+        await (0, firestore_2.setDoc)(docRef, data, { merge: true });
+        return `Document updated with ID: ${docRef.id}`;
+    }
+    catch (e) {
+        return "Error updating document: " + e;
+    }
+}
+exports.updateImageById = updateImageById;
+async function deleteImageById(imageId, collection) {
+    try {
+        const docRef = (0, firestore_2.doc)(db, collection, imageId);
         await (0, firestore_1.deleteDoc)(docRef);
     }
     catch (e) {

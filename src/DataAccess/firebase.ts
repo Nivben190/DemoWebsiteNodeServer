@@ -2,6 +2,8 @@
 import { initializeApp } from "firebase/app";
 import { addDoc, collection, deleteDoc, getDocs, getFirestore, increment } from "firebase/firestore";
 import { doc, setDoc } from "firebase/firestore"; 
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -43,9 +45,22 @@ export async function likeImageById(imageId: string): Promise<any> {
     }
 }
 
-export async function deleteImageById(imageId: string): Promise<any> {
+export async function updateImageById(imageId: string, data: any): Promise<any> {
     try {
-        const docRef = doc(db, 'images', imageId);
+        var collection = data.collection;
+        const docRef = doc(db, collection, imageId);
+        await setDoc(docRef, data, { merge: true });
+        return `Document updated with ID: ${docRef.id}`;
+    } catch (e) {
+        return "Error updating document: " + e;
+    }
+  
+}
+
+
+export async function deleteImageById(imageId: string,collection:string): Promise<any> {
+    try {
+        const docRef = doc(db, collection, imageId);
         await deleteDoc(docRef);
     } catch (e) {
         return "Error deleting document: " + e;

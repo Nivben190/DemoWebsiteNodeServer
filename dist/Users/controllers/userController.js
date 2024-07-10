@@ -11,11 +11,6 @@ class UserController {
             const { email, password } = req.body;
             const error = (0, loginHelper_1.validate)(email, password);
             if (error) {
-                const log = {
-                    message: 'Invalid email or password',
-                    error: error,
-                    metaData: { email, password }
-                };
                 res.status(400).json({ error });
                 return;
             }

@@ -5,6 +5,17 @@ const imagesService_1 = require("../services/imagesService");
 class ImagesController {
     constructor() {
     }
+    async updateImage(req) {
+        try {
+            const data = req.body;
+            data.file = req.file;
+            var newData = await (0, imagesService_1.updateImage)(data);
+            return newData;
+        }
+        catch (error) {
+            return;
+        }
+    }
     async getLazyLoadingImages(req, res) {
         try {
             const images = await (0, imagesService_1.getLazyLoadingImages)(req.body);
@@ -26,7 +37,7 @@ class ImagesController {
     }
     async uploadImage(data) {
         try {
-            await (0, imagesService_1.uploadImage)(data);
+            return await (0, imagesService_1.uploadImage)(data);
         }
         catch (error) {
         }
@@ -42,8 +53,9 @@ class ImagesController {
     }
     async deleteImage(req, res) {
         try {
-            const imageId = req.params.imageId;
-            await (0, imagesService_1.deleteImage)(imageId);
+            const imageId = req.body.imageId;
+            const collection = req.body.collection;
+            await (0, imagesService_1.deleteImage)(imageId, collection);
         }
         catch (error) {
             res.status(500).json({ error: 'Internal server error' });

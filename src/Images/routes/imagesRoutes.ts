@@ -108,8 +108,9 @@ router.post('/upload', upload.single('image'), async (req: Request, res: Respons
         const { title, collection } = req.body;
         const data = { file: req.file, title, collection };
 
-        imagesController.uploadImage(data);
-        res.status(200).json({ message: 'Image uploaded' });
+        var imageData = await imagesController.uploadImage(data);
+        
+        res.status(200).json(imageData ?? { message: 'Image uploaded' });
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -146,7 +147,7 @@ router.post('/upload', upload.single('image'), async (req: Request, res: Respons
  *       500:
  *         description: Internal server error
  */
-router.delete('/delete', async (req: Request, res: Response) => {
+router.post('/delete', async (req: Request, res: Response) => {
     try {
         await imagesController.deleteImage(req, res);
         res.status(200).json({ message: 'Image deleted' });
@@ -190,5 +191,45 @@ router.post('/like', async (req: Request, res: Response) => {
     }
 }
 );
+
+
+// update image 
+/**
+ * @swagger
+ * /images/update:
+ *   put:
+ *     summary: Update image
+ *     description: Update an image.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *               title:
+ *                 type: string
+ *               collection:
+ *                 type: string
+ *               imageId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Image updated
+ *       500:
+ *         description: Internal server error
+ */
+router.put('/update', upload.single('image'), async (req: Request, res: Response) => {
+    try {
+        
+        var newData =await imagesController.updateImage(req);
+        res.status(200).json(newData);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 export default router;
