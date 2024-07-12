@@ -37,9 +37,9 @@ export async function add(data:any, collectionName:string) {
 
 export async function likeImageById(imageId: string): Promise<any> {
     try {
-        const docRef = doc(db, 'images', imageId);
+        
+        const docRef = doc(db, 'gallery', imageId);
         await setDoc(docRef, { likes:increment(1)  }, { merge: true });
-        return `Document updated with ID: ${docRef.id}`;
     } catch (e) {
         return "Error updating document: " + e;
     }

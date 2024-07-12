@@ -47,8 +47,9 @@ export class ImagesController {
     public async likeImage(imageId: string, res: Response): Promise<void> {
 
         try {
-           const objectId =  await likeImage(imageId);
-            return objectId;
+             await likeImage(imageId);
+           
+            res.status(200).json(true);            
         } catch (error) {
             res.status(500).json({ error: 'Internal server error' });
         }

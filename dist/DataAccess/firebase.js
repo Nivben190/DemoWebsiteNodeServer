@@ -33,9 +33,8 @@ async function add(data, collectionName) {
 exports.add = add;
 async function likeImageById(imageId) {
     try {
-        const docRef = (0, firestore_2.doc)(db, 'images', imageId);
+        const docRef = (0, firestore_2.doc)(db, 'gallery', imageId);
         await (0, firestore_2.setDoc)(docRef, { likes: (0, firestore_1.increment)(1) }, { merge: true });
-        return `Document updated with ID: ${docRef.id}`;
     }
     catch (e) {
         return "Error updating document: " + e;
