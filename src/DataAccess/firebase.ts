@@ -98,7 +98,7 @@ export async function getLazyLoadingImagesFromDb(lastDoc: any | null, limitNumbe
     try{
         const querySnapshot = await getDocs(imagesQuery);
         if (querySnapshot.empty) {
-            console.log('No more documents to retrieve.');
+            console.log('No more  to retrieve.');
             return { images, lastVisibleCreateDate: null };
         } else {
             images = querySnapshot.docs.map((doc) => ({
