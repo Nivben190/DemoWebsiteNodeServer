@@ -18,9 +18,9 @@ import multer from 'multer';
  *           schema:
  *             type: object
  *             properties:
- *               firstIndex:
+ *               lastDoc:
  *                 type: number
- *               skipIndex:
+ *               limitNumber:
  *                 type: number
  *     responses:
  *       200:
@@ -30,8 +30,8 @@ import multer from 'multer';
  */
 router.post('/lazyloading', async (req: Request, res: Response) => {
     try {
-        const images = await imagesController.getLazyLoadingImages(req, res);
-        res.status(200).json(images);
+        const response = await imagesController.getLazyLoadingImages(req, res);
+        res.status(200).json(response);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }

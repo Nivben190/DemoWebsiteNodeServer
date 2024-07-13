@@ -45,7 +45,7 @@ class ImagesController {
     async likeImage(imageId, res) {
         try {
             await (0, imagesService_1.likeImage)(imageId);
-            res.status(200).json({ message: 'Image liked' });
+            res.status(200).json(true);
         }
         catch (error) {
             res.status(500).json({ error: 'Internal server error' });

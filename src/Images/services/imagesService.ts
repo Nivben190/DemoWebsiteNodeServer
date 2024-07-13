@@ -1,6 +1,6 @@
 
 import { getStorage,ref,getDownloadURL,uploadBytesResumable } from "firebase/storage"; // Corrected import for getStorage
-import { deleteImageById, firebaseConfig, getImagesByCollectionName, getLazyLoadingImagesFroDb } from "../../DataAccess/firebase";
+import { deleteImageById, firebaseConfig, getImagesByCollectionName, getLazyLoadingImagesFromDb } from "../../DataAccess/firebase";
 import { likeImageById } from '../../DataAccess/firebase';
 import { initializeApp } from "firebase/app";
 import { add } from '../../DataAccess/firebase';
@@ -23,7 +23,7 @@ export async function getImagesBySection(section: string): Promise<any> {
 }
 
 export async function getLazyLoadingImages(lazyLoadingArgs: any): Promise<any> {
-    return await getLazyLoadingImagesFroDb(lazyLoadingArgs);
+    return await getLazyLoadingImagesFromDb(lazyLoadingArgs.lastDoc, lazyLoadingArgs.limitNumber);
 }
 export async function updateImage(data: any): Promise<any> {
     var file = data.file;

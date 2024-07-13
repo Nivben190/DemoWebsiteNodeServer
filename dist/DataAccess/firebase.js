@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getLazyLoadingImagesFroDb = exports.getImagesByCollectionName = exports.deleteImageById = exports.updateImageById = exports.likeImageById = exports.add = exports.firebaseConfig = void 0;
+exports.getLazyLoadingImagesFromDb = exports.getImagesByCollectionName = exports.deleteImageById = exports.updateImageById = exports.likeImageById = exports.add = exports.firebaseConfig = void 0;
 // Import the functions you need from the SDKs you need
 const app_1 = require("firebase/app");
 const firestore_1 = require("firebase/firestore");
@@ -74,11 +74,33 @@ async function getImagesByCollectionName(collectionName) {
     }
 }
 exports.getImagesByCollectionName = getImagesByCollectionName;
-async function getLazyLoadingImagesFroDb(lazyLoadingArgs) {
-    const firstIndex = lazyLoadingArgs.firstIndex;
-    const skipIndex = lazyLoadingArgs.skipIndex;
-    const querySnapshot = await (0, firestore_1.getDocs)((0, firestore_1.collection)(db, 'gallery'));
-    const images = querySnapshot.docs.map((doc) => (Object.assign({ id: doc.id }, doc.data())));
-    return images.slice(firstIndex, skipIndex);
+async function getLazyLoadingImagesFromDb(lastDoc, limitNumber) {
+    let imagesQuery;
+    let images = [];
+    if (lastDoc) {
+        lastDoc = new firestore_1.Timestamp(lastDoc.seconds, lastDoc.nanoseconds);
+        imagesQuery = (0, firestore_1.query)((0, firestore_1.collection)(db, 'gallery'), (0, firestore_1.orderBy)('createDate'), (0, firestore_1.startAfter)(lastDoc), (0, firestore_1.limit)(limitNumber));
+    }
+    else {
+        imagesQuery = (0, firestore_1.query)((0, firestore_1.collection)(db, 'gallery'), (0, firestore_1.orderBy)('createDate'), (0, firestore_1.limit)(limitNumber));
+    }
+    try {
+        const querySnapshot = await (0, firestore_1.getDocs)(imagesQuery);
+        if (querySnapshot.empty) {
+            console.log('No more documents to retrieve.');
+            return { images, lastVisibleCreateDate: null };
+        }
+        else {
+            images = querySnapshot.docs.map((doc) => (Object.assign({ id: doc.id }, doc.data())));
+        }
+        const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
+        const lastVisibleCreateDate = lastVisible === null || lastVisible === void 0 ? void 0 : lastVisible.data().createDate;
+        console.log(`Last image created at: ${lastVisibleCreateDate}`);
+        return { images, lastVisibleCreateDate };
+    }
+    catch (e) {
+        return { images, lastVisibleCreateDate: null };
+        console.log("Error getting documents: " + e);
+    }
 }
-exports.getLazyLoadingImagesFroDb = getLazyLoadingImagesFroDb;
+exports.getLazyLoadingImagesFromDb = getLazyLoadingImagesFromDb;

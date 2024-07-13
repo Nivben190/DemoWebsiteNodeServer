@@ -24,7 +24,7 @@ async function getImagesBySection(section) {
 }
 exports.getImagesBySection = getImagesBySection;
 async function getLazyLoadingImages(lazyLoadingArgs) {
-    return await (0, firebase_1.getLazyLoadingImagesFroDb)(lazyLoadingArgs);
+    return await (0, firebase_1.getLazyLoadingImagesFromDb)(lazyLoadingArgs.lastDoc, lazyLoadingArgs.limitNumber);
 }
 exports.getLazyLoadingImages = getLazyLoadingImages;
 async function updateImage(data) {

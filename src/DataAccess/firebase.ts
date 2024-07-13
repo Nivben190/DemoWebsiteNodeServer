@@ -1,9 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { addDoc, collection, deleteDoc, getDocs, getFirestore, increment } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, getDocs, getFirestore, increment ,query,limit,orderBy, startAfter, QueryDocumentSnapshot, Timestamp, } from "firebase/firestore";
 import { doc, setDoc } from "firebase/firestore"; 
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { v4 as uuidv4 } from "uuid";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -79,14 +77,45 @@ export async function getImagesByCollectionName(collectionName: string): Promise
         return "Error getting documents: " + e;
     }
 }
-
-export async function getLazyLoadingImagesFroDb(lazyLoadingArgs: any): Promise<any> {
-    const firstIndex = lazyLoadingArgs.firstIndex;
-    const skipIndex = lazyLoadingArgs.skipIndex;
-    const querySnapshot = await getDocs(collection(db, 'gallery'));
-    const images = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data()
-    }));
-     return images.slice(firstIndex, skipIndex);
+export async function getLazyLoadingImagesFromDb(lastDoc: any | null, limitNumber: number): Promise<{ images: any[], lastVisibleCreateDate: any }> {
+    let imagesQuery;
+    let images: any[] = [];
+    if (lastDoc) {
+        lastDoc = new Timestamp(lastDoc.seconds, lastDoc.nanoseconds);
+       imagesQuery = query(
+            collection(db, 'gallery'),
+            orderBy('createDate'),
+            startAfter(lastDoc),
+            limit(limitNumber)
+        );
+    } else {
+        imagesQuery = query(
+            collection(db, 'gallery'),
+            orderBy('createDate'),
+            limit(limitNumber)
+        );
+    }
+    try{
+        const querySnapshot = await getDocs(imagesQuery);
+        if (querySnapshot.empty) {
+            console.log('No more documents to retrieve.');
+            return { images, lastVisibleCreateDate: null };
+        } else {
+            images = querySnapshot.docs.map((doc) => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+        }
+    
+        const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
+        const lastVisibleCreateDate = lastVisible?.data().createDate ;
+        console.log(`Last image created at: ${lastVisibleCreateDate}`);
+        
+        return { images, lastVisibleCreateDate };
+    }
+    catch(e){
+        return { images, lastVisibleCreateDate: null };
+        console.log("Error getting documents: " + e);
+    }
+ 
 }
