@@ -14,8 +14,8 @@ app.use(cors());
 
 app.use(express.json());
 //ping route
-app.head('/ping', (req, res) => {
-    res.send('pong');
+app.get('/checkConnection', (req, res) => {
+    res.send('i am alive');
   });
 app.use('/images', imagesRoutes);
 app.use('/users', userRoutes);
