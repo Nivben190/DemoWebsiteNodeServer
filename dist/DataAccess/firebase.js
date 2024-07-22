@@ -87,7 +87,7 @@ async function getLazyLoadingImagesFromDb(lastDoc, limitNumber) {
     try {
         const querySnapshot = await (0, firestore_1.getDocs)(imagesQuery);
         if (querySnapshot.empty) {
-            console.log('No more documents to retrieve.');
+            console.log('No more  to retrieve.');
             return { images, lastVisibleCreateDate: null };
         }
         else {

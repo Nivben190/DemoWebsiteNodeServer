@@ -13,6 +13,10 @@ app.use(cors());
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(express.json());
+//ping route
+app.get('/ping', (req, res) => {
+    res.send('pong');
+  });
 app.use('/images', imagesRoutes);
 app.use('/users', userRoutes);
 async function startServer () {
