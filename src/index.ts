@@ -14,7 +14,7 @@ app.use(cors());
 
 app.use(express.json());
 //ping route
-app.get('/ping', (req, res) => {
+app.head('/ping', (req, res) => {
     res.send('pong');
   });
 app.use('/images', imagesRoutes);
