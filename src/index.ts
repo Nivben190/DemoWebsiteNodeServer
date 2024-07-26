@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import filterRoutes from './filters/routes/filtersRoute';
 import userRoutes from './Users/routes/userRoutes';
 import imagesRoutes from './Images/routes/imagesRoutes';
 const swaggerUi = require('swagger-ui-express');
@@ -19,6 +20,7 @@ app.get('/checkConnection', (req, res) => {
   });
 app.use('/images', imagesRoutes);
 app.use('/users', userRoutes);
+app.use('/filters', filterRoutes);
 async function startServer () {
 
     try {

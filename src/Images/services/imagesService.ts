@@ -1,11 +1,11 @@
 
 import { getStorage,ref,getDownloadURL,uploadBytesResumable } from "firebase/storage"; // Corrected import for getStorage
-import { deleteImageById, firebaseConfig, getImagesByCollectionName, getLazyLoadingImagesFromDb } from "../../DataAccess/firebase";
+import { deleteDocById, firebaseConfig, getDataByCollectionName, getLazyLoadingImagesFromDb } from "../../DataAccess/firebase";
 import { likeImageById } from '../../DataAccess/firebase';
 import { initializeApp } from "firebase/app";
 import { add } from '../../DataAccess/firebase';
 import { getAnalytics, isSupported } from "firebase/analytics";
-import { updateImageById } from "../../DataAccess/firebase";
+import { updateDocById } from "../../DataAccess/firebase";
 const fireBase =initializeApp(firebaseConfig); // Corrected initialization of firebase
 isSupported().then((supported) => {
     if (supported) {
@@ -19,7 +19,7 @@ const storage = getStorage();
 
 
 export async function getImagesBySection(section: string): Promise<any> {
-    return await getImagesByCollectionName(section);
+    return await getDataByCollectionName(section);
 }
 
 export async function getLazyLoadingImages(lazyLoadingArgs: any): Promise<{ images: any[], lastVisibleCreateDate: any }> {
@@ -34,13 +34,13 @@ export async function updateImage(data: any): Promise<any> {
     try{
     if(file)
     {
-        deleteImageById(imageId,collection);
+        deleteDocById(imageId,collection);
         var { url, title, collection } = await uploadToStorage(data);  
-        await updateImageById(imageId, {url: url, title: title, collection: collection});
+        await updateDocById(imageId, {url: url, title: title, collection: collection});
         return { url, title, collection };
      }
     else{
-        await updateImageById(imageId, {title: title, collection: collection});
+        await updateDocById(imageId, {title: title, collection: collection});
         return { title, collection };
     }
     return;
@@ -88,6 +88,6 @@ export async function likeImage(imageId: string): Promise<any> {
 }
 
 export async function deleteImage(imageId: string,collection:string): Promise<any> {
-    await deleteImageById(imageId,collection);
+    await deleteDocById(imageId,collection);
     return;
 }

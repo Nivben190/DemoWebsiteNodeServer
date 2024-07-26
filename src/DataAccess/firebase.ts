@@ -38,10 +38,11 @@ export async function likeImageById(imageId: string): Promise<any> {
     }
 }
 
-export async function updateImageById(imageId: string, data: any): Promise<any> {
+export async function updateDocById(docId: string, data: any): Promise<any> {
     try {
         var collection = data.collection;
-        const docRef = doc(db, collection, imageId);
+        delete data.collection;
+        const docRef = doc(db, collection, docId);
         await setDoc(docRef, data, { merge: true });
         return `Document updated with ID: ${docRef.id}`;
     } catch (e) {
@@ -50,24 +51,23 @@ export async function updateImageById(imageId: string, data: any): Promise<any> 
   
 }
 
-
-export async function deleteImageById(imageId: string,collection:string): Promise<any> {
+export async function deleteDocById(id: string,collection:string): Promise<any> {
     try {
-        const docRef = doc(db, collection, imageId);
+        const docRef = doc(db, collection, id);
         await deleteDoc(docRef);
     } catch (e) {
         return "Error deleting document: " + e;
     }
 }
 
-export async function getImagesByCollectionName(collectionName: string): Promise<any> {
+export async function getDataByCollectionName(collectionName: string): Promise<any> {
     try {
         const querySnapshot = await getDocs(collection(db, collectionName));
-        const images = querySnapshot.docs.map((doc) => ({
+        const data = querySnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data()
         }));
-        return images;
+        return data;
     } catch (e) {
         return "Error getting documents: " + e;
     }
