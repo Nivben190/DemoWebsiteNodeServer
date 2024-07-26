@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import { ImagesController } from '../controllers/imagesController';
 const router = express.Router();
 const imagesController = new ImagesController();
-const formidable = require('formidable');
+
 import multer from 'multer';
 
 //lazy loading images 

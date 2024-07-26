@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
-  "scripts": {
+    "scripts": {
     "start": "npm run build && node ./dist/index.js",
     "build": "tsc",
     "dev": "nodemon --watch 'src/**/*' -e ts,tsx --exec ts-node ./src/index.ts"
@@ -19,9 +19,12 @@
     "express": "^4.19.2",
     "firebase": "^10.12.3",
     "formidable": "^3.5.1",
+    "ioredis": "^5.4.1",
     "mongodb": "^6.7.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
+    "redis": "^4.6.15",
+    "redis-cli": "^2.1.2",
     "sharp": "^0.33.4",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",

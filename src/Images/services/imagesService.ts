@@ -22,7 +22,7 @@ export async function getImagesBySection(section: string): Promise<any> {
     return await getImagesByCollectionName(section);
 }
 
-export async function getLazyLoadingImages(lazyLoadingArgs: any): Promise<any> {
+export async function getLazyLoadingImages(lazyLoadingArgs: any): Promise<{ images: any[], lastVisibleCreateDate: any }> {
     return await getLazyLoadingImagesFromDb(lazyLoadingArgs.lastDoc, lazyLoadingArgs.limitNumber);
 }
 export async function updateImage(data: any): Promise<any> {

@@ -17,8 +17,9 @@ export class ImagesController {
         }
     }
     
-    public async getLazyLoadingImages(req: Request, res: Response): Promise<void> {
+    public async getLazyLoadingImages(req: Request, res: Response): Promise<any> {
         try {
+            
             const images = await getLazyLoadingImages(req.body);
             return images;
         } catch (error) {

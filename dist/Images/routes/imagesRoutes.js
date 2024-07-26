@@ -7,8 +7,11 @@ const express_1 = __importDefault(require("express"));
 const imagesController_1 = require("../controllers/imagesController");
 const router = express_1.default.Router();
 const imagesController = new imagesController_1.ImagesController();
+const redis = require('redis');
+const client = redis.createClient(6379);
 const formidable = require('formidable');
 const multer_1 = __importDefault(require("multer"));
+const cacheMiddelware_1 = require("../middleware/cacheMiddelware");
 //lazy loading images 
 /**
  * @swagger
@@ -35,6 +38,8 @@ const multer_1 = __importDefault(require("multer"));
 router.post('/lazyloading', async (req, res) => {
     try {
         const response = await imagesController.getLazyLoadingImages(req, res);
+        console.log("before caching images");
+        (0, cacheMiddelware_1.cacheImages)(response);
         res.status(200).json(response);
     }
     catch (error) {

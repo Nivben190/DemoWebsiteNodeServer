@@ -95,7 +95,6 @@ async function getLazyLoadingImagesFromDb(lastDoc, limitNumber) {
         }
         const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
         const lastVisibleCreateDate = lastVisible === null || lastVisible === void 0 ? void 0 : lastVisible.data().createDate;
-        console.log(`Last image created at: ${lastVisibleCreateDate}`);
         return { images, lastVisibleCreateDate };
     }
     catch (e) {

@@ -11,10 +11,13 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
 const app = (0, express_1.default)();
 const port = 3000;
-//all cors origin
 app.use((0, cors_1.default)());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(express_1.default.json());
+//ping route
+app.get('/checkConnection', (req, res) => {
+    res.send('i am alive');
+});
 app.use('/images', imagesRoutes_1.default);
 app.use('/users', userRoutes_1.default);
 async function startServer() {

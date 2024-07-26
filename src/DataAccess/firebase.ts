@@ -2,12 +2,8 @@
 import { initializeApp } from "firebase/app";
 import { addDoc, collection, deleteDoc, getDocs, getFirestore, increment ,query,limit,orderBy, startAfter, QueryDocumentSnapshot, Timestamp, } from "firebase/firestore";
 import { doc, setDoc } from "firebase/firestore"; 
+import { cacheImage, cacheMiddlewareForLazyLoading } from "../Images/middleware/cacheMiddelware";
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 export const firebaseConfig = {
   apiKey: "AIzaSyBVnn0AZ8IWdmtzZupoTPxxrMu1_lhVJB8",
   authDomain: "dianashimongallery.firebaseapp.com",
@@ -18,7 +14,6 @@ export const firebaseConfig = {
   measurementId: "G-JQ5P7Q88S1"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
@@ -80,6 +75,15 @@ export async function getImagesByCollectionName(collectionName: string): Promise
 export async function getLazyLoadingImagesFromDb(lastDoc: any | null, limitNumber: number): Promise<{ images: any[], lastVisibleCreateDate: any }> {
     let imagesQuery;
     let images: any[] = [];
+    const cacheKey = `images:${lastDoc ? lastDoc.seconds : 'start'}:${limitNumber}`;
+    var cachedData = await cacheMiddlewareForLazyLoading(cacheKey);
+    if(cachedData){
+        console.log(`Cache hit for key ${cacheKey}`);
+        const cachedResult = JSON.parse(cachedData);
+        return { images: cachedResult.images, lastVisibleCreateDate: cachedResult.lastVisibleCreateDate };
+    }
+    console.log(`Cache miss for key ${cacheKey}`);
+
     if (lastDoc) {
         lastDoc = new Timestamp(lastDoc.seconds, lastDoc.nanoseconds);
        imagesQuery = query(
@@ -109,7 +113,8 @@ export async function getLazyLoadingImagesFromDb(lastDoc: any | null, limitNumbe
     
         const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
         const lastVisibleCreateDate = lastVisible?.data().createDate ;
-        
+        cacheImage(cacheKey, { images, lastVisibleCreateDate });
+
         return { images, lastVisibleCreateDate };
     }
     catch(e){
