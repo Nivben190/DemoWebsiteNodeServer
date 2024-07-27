@@ -85,7 +85,8 @@ async function uploadToStorage(image: any) {
             url: imageData.url,
             likes: 0,
             title: imageData.title,
-            Style : imageData.Style
+            Style : imageData.Style,
+            createDate: new Date().toISOString()
      }
     await add(imageDTO, imageData.collection);
     return;
