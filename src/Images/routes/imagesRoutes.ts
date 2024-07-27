@@ -30,16 +30,14 @@ import multer from 'multer';
  */
 router.post('/lazyloading', async (req: Request, res: Response) => {
     try {
-        const response = await imagesController.getLazyLoadingImages(req, res);
-        res.status(200).json(response);
+        
+        const images = await imagesController.getLazyLoadingImages(req, res);
+        res.status(200).json(images);
     } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Server error' });
     }
-}
-);
+});
 
-
-//get images by section
 /**
  * @swagger
  * /images/getBySection:
@@ -73,8 +71,6 @@ router.post('/getBySection', async (req: Request, res: Response) => {
     }
 }
 );
-
-//upload 
 /**
  * @swagger
  * /images/upload:
@@ -85,16 +81,18 @@ router.post('/getBySection', async (req: Request, res: Response) => {
  *       required: true
  *       content:
  *         multipart/form-data:
- *            schema:
-*             type: object
-*             properties:
-*               image:
-*                 type: string
-*                 format: binary
-*               title:
-*                 type: string
-*               collection:
-*                 type: string
+ *           schema:
+ *             type: object
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *               title:
+ *                 type: string
+ *               collection:
+ *                 type: string
+ *               style:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Image uploaded
@@ -102,11 +100,12 @@ router.post('/getBySection', async (req: Request, res: Response) => {
  *         description: Internal server error
  */
 
+
 const upload = multer({ storage: multer.memoryStorage() });
 router.post('/upload', upload.single('image'), async (req: Request, res: Response) => {
     try {
-        const { title, collection } = req.body;
-        const data = { file: req.file, title, collection };
+        const { title, collection,style } = req.body;
+        const data = { file: req.file, title, collection,style };
 
         var imageData = await imagesController.uploadImage(data);
         
@@ -116,24 +115,6 @@ router.post('/upload', upload.single('image'), async (req: Request, res: Respons
     }
 }
 );
-
-// router.post('/upload', async (req: Request, res: Response) => {
-
-//     const form = new formidable.IncomingForm();
-//     form.parse(req, async function (err :any, fields :any, files :any) {
-//         const file = files.image[0] ;
-//          const title = fields.title[0]; 
-//          const container = fields.container[0];
-//          file.title = title;
-//         try {
-//             await imagesController.uploadImage(file,res,container);
-//             res.status(201).json({ message: 'Image uploaded' });
-//         } catch (error) {
-//             res.status(500).json({ error: 'Internal server error' });
-//         }
-//       });
-        
-//     });
 //delete
 /**
  * @swagger
@@ -181,6 +162,7 @@ router.post('/delete', async (req: Request, res: Response) => {
  *         description: Internal server error
  */
 
+
 router.post('/like', async (req: Request, res: Response) => {
     try {
         const imageId = req.body.imageId;
@@ -192,44 +174,50 @@ router.post('/like', async (req: Request, res: Response) => {
 }
 );
 
-
-// update image 
 /**
  * @swagger
- * /images/update:
+ * /update:
  *   put:
- *     summary: Update image
- *     description: Update an image.
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               image:
- *                 type: string
- *                 format: binary
- *               title:
- *                 type: string
- *               collection:
- *                 type: string
- *               imageId:
- *                 type: string
+ *     summary: Update an image
+ *     consumes:
+ *       - multipart/form-data
+ *     parameters:
+ *       - in: formData
+ *         name: image
+ *         type: file
+ *         description: The image to upload
+ *       - in: body
+ *         name: body
+ *         description: Image data
+ *         schema:
+ *           type: object
+ *           properties:
+ *             image:
+ *               type: string
+ *               format: binary
+ *             title:
+ *               type: string
+ *             collection:
+ *               type: string
+ *             imageId:
+ *               type: string
+ *             style:
+ *               type: string
  *     responses:
  *       200:
  *         description: Image updated
  *       500:
  *         description: Internal server error
  */
+
 router.put('/update', upload.single('image'), async (req: Request, res: Response) => {
     try {
-        
-        var newData =await imagesController.updateImage(req);
+        var newData = await imagesController.updateImage(req);
         res.status(200).json(newData);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 export default router;

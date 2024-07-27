@@ -74,6 +74,7 @@ export async function getDataByCollectionName(collectionName: string): Promise<a
 }
 export async function getLazyLoadingImagesFromDb(lastDoc: any | null, limitNumber: number): Promise<{ images: any[], lastVisibleCreateDate: any }> {
     let imagesQuery;
+    
     let images: any[] = [];
     const cacheKey = `images:${lastDoc ? lastDoc.seconds : 'start'}:${limitNumber}`;
     var cachedData = await cacheMiddlewareForLazyLoading(cacheKey);

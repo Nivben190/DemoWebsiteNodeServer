@@ -112,7 +112,6 @@ router.delete('/delete', async (req: Request, res: Response) => {
   */
 router.get('/get', async (req: Request, res: Response) => {
     try {
-        console.log('get filters');
         
         const filters = await filterController.getFilters(req,res);
         res.status(200).json(filters);

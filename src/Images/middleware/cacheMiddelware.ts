@@ -35,6 +35,46 @@ export const cacheMiddlewareForLazyLoading = async (cacheKey:string) => {
 }
 
 
+export async function deleteFromCache(id:string) {
+    const keys = await client.keys('images:*');
+    keys.forEach(async key => {
+        const cachedData = await client.get(key);
+        if (cachedData) {
+            const cachedResult = JSON.parse(cachedData);
+            const index = cachedResult.images.findIndex((image: { id: any; }) => image.id === id);
+            if (index !== -1) {
+                cachedResult.images.splice(index, 1);
+                client.set(key, JSON.stringify(cachedResult));
+            }
+        }
+    });
+}
+
+
+export async function updateCacheWithNewData(newData:any) {
+    const keys = await client.keys('images:*');
+    
+    keys.forEach(async key => {
+        const cachedData = await client.get(key);
+        
+        if (cachedData) {
+            const cachedResult = JSON.parse(cachedData);
+            const index = cachedResult.images.findIndex((image: { id: any; }) => image.id === newData.id);
+            
+            if (index !== -1) {
+                cachedResult.images[index] = {
+                    ...cachedResult.images[index],
+                    title: newData.title,
+                    Style : newData.Style
+                };
+                client.set(key, JSON.stringify(cachedResult));
+            }
+        }
+    });
+}
+    
+
+
 
  export const cacheImage = (cacheKey:string,data:any) => {
     try {

@@ -6,6 +6,7 @@ import { initializeApp } from "firebase/app";
 import { add } from '../../DataAccess/firebase';
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { updateDocById } from "../../DataAccess/firebase";
+import { deleteFromCache, updateCacheWithNewData } from "../middleware/cacheMiddelware";
 const fireBase =initializeApp(firebaseConfig); // Corrected initialization of firebase
 isSupported().then((supported) => {
     if (supported) {
@@ -26,21 +27,26 @@ export async function getLazyLoadingImages(lazyLoadingArgs: any): Promise<{ imag
     return await getLazyLoadingImagesFromDb(lazyLoadingArgs.lastDoc, lazyLoadingArgs.limitNumber);
 }
 export async function updateImage(data: any): Promise<any> {
+    
     var file = data.file;
     var title = data.title;
     var collection = data.collection;
     var imageId = data.imageId;
+    var style = data.style;
    
     try{
     if(file)
     {
         deleteDocById(imageId,collection);
         var { url, title, collection } = await uploadToStorage(data);  
-        await updateDocById(imageId, {url: url, title: title, collection: collection});
+        await updateDocById(imageId, {url: url, title: title, collection: collection,Style : style});
+        updateCacheWithNewData({url: url, title: title, collection: collection,Style : style});
         return { url, title, collection };
      }
     else{
-        await updateDocById(imageId, {title: title, collection: collection});
+        await updateDocById(imageId, {title: title, collection: collection,Style : style});
+        updateCacheWithNewData({ title: title, collection: collection,Style : style,id:imageId});
+
         return { title, collection };
     }
     return;
@@ -52,11 +58,12 @@ export async function updateImage(data: any): Promise<any> {
 
 export async function uploadImage(image: any): Promise<any> {
     var { url, title, collection } = await uploadToStorage(image);
-    addImageToDb({url: url, title: title, collection: collection});
+    addImageToDb({url: url, title: title, collection: collection,Style : image.style});
     return {
         url,
         title,
-        collection
+        collection,
+        createDate : new Date().toISOString()
     };
 }
 async function uploadToStorage(image: any) {
@@ -77,7 +84,8 @@ async function uploadToStorage(image: any) {
      const imageDTO ={
             url: imageData.url,
             likes: 0,
-            title: imageData.title
+            title: imageData.title,
+            Style : imageData.Style
      }
     await add(imageDTO, imageData.collection);
     return;
@@ -89,5 +97,6 @@ export async function likeImage(imageId: string): Promise<any> {
 
 export async function deleteImage(imageId: string,collection:string): Promise<any> {
     await deleteDocById(imageId,collection);
+    deleteFromCache(imageId);
     return;
 }
