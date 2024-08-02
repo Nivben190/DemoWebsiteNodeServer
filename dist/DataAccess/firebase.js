@@ -73,15 +73,9 @@ exports.getDataByCollectionName = getDataByCollectionName;
 async function getLazyLoadingImagesFromDb(lastDoc, limitNumber) {
     let imagesQuery;
     let images = [];
-    // const cacheKey = `images:${lastDoc ? lastDoc.seconds : 'start'}:${limitNumber}`;
-    // var cachedData = await cacheMiddlewareForLazyLoading(cacheKey);
-    // if(cachedData){
-    //     console.log(`Cache hit for key ${cacheKey}`);
-    //     const cachedResult = JSON.parse(cachedData);
-    //     return { images: cachedResult.images, lastVisibleCreateDate: cachedResult.lastVisibleCreateDate };
-    // }
-    // console.log(`Cache miss for key ${cacheKey}`);
     if (lastDoc) {
+        console.log("lastDoc", lastDoc);
+        console.log("limitNumber", limitNumber);
         imagesQuery = (0, firestore_1.query)((0, firestore_1.collection)(db, 'gallery'), (0, firestore_1.orderBy)('index'), (0, firestore_1.startAfter)(lastDoc), (0, firestore_1.limit)(limitNumber));
     }
     else {
@@ -98,7 +92,6 @@ async function getLazyLoadingImagesFromDb(lastDoc, limitNumber) {
         }
         const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
         const lastVisibleIndex = lastVisible === null || lastVisible === void 0 ? void 0 : lastVisible.data().index;
-        // cacheImage(cacheKey, { images, lastVisibleCreateDate });
         return { images, lastVisibleIndex };
     }
     catch (e) {

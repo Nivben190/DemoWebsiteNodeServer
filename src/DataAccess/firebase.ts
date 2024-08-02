@@ -2,7 +2,6 @@
 import { initializeApp } from "firebase/app";
 import { addDoc, collection, deleteDoc, getDocs, getFirestore, increment ,query,limit,orderBy, startAfter, QueryDocumentSnapshot, Timestamp, } from "firebase/firestore";
 import { doc, setDoc } from "firebase/firestore"; 
-import { cacheImage, cacheMiddlewareForLazyLoading } from "../Images/middleware/cacheMiddelware";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyBVnn0AZ8IWdmtzZupoTPxxrMu1_lhVJB8",
@@ -20,6 +19,7 @@ const db = getFirestore(app);
 
 export async function add(data:any, collectionName:string) {
     try {
+
         const docRef = await addDoc(collection(db, collectionName), data);
         return `Document added with ID: ${docRef.id}`;
 
@@ -76,17 +76,9 @@ export async function getLazyLoadingImagesFromDb(lastDoc: any | null, limitNumbe
     let imagesQuery;
     
     let images: any[] = [];
-    // const cacheKey = `images:${lastDoc ? lastDoc.seconds : 'start'}:${limitNumber}`;
-    // var cachedData = await cacheMiddlewareForLazyLoading(cacheKey);
-    // if(cachedData){
-    //     console.log(`Cache hit for key ${cacheKey}`);
-    //     const cachedResult = JSON.parse(cachedData);
-    //     return { images: cachedResult.images, lastVisibleCreateDate: cachedResult.lastVisibleCreateDate };
-    // }
-    // console.log(`Cache miss for key ${cacheKey}`);
-
     
     if (lastDoc) {
+        
        imagesQuery = query(
             collection(db, 'gallery'),
             orderBy('index'),
@@ -114,7 +106,6 @@ export async function getLazyLoadingImagesFromDb(lastDoc: any | null, limitNumbe
     
         const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
         const lastVisibleIndex = lastVisible?.data().index ;
-        // cacheImage(cacheKey, { images, lastVisibleCreateDate });
 
         return { images, lastVisibleIndex };
     }

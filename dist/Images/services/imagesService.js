@@ -43,7 +43,6 @@ async function updateImage(data) {
         }
         else {
             await (0, firebase_4.updateDocById)(imageId, { title: title, collection: collection, Style: style });
-            // updateCacheWithNewData({ title: title, collection: collection,Style : style,id:imageId});
             return { title, collection };
         }
         return;
@@ -78,11 +77,13 @@ async function uploadToStorage(image) {
     return { url, title, collection };
 }
 async function addImageToDb(imageData) {
+    const index = await (0, firebase_1.getDataByCollectionName)(imageData.collection).then((data) => data.length);
     const imageDTO = {
         url: imageData.url,
         likes: 0,
         title: imageData.title,
         Style: imageData.Style,
+        index: index,
         createDate: new Date().toISOString()
     };
     await (0, firebase_3.add)(imageDTO, imageData.collection);
@@ -92,7 +93,6 @@ async function saveImagesLayout(images) {
     images.forEach(async (image) => {
         await (0, firebase_4.updateDocById)(image.id, image);
     });
-    // updateCacheWithUpdatedArrayData(images);
 }
 exports.saveImagesLayout = saveImagesLayout;
 async function likeImage(imageId) {

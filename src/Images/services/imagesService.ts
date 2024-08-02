@@ -45,7 +45,6 @@ export async function updateImage(data: any): Promise<any> {
      }
     else{
         await updateDocById(imageId, {title: title, collection: collection,Style : style});
-        // updateCacheWithNewData({ title: title, collection: collection,Style : style,id:imageId});
 
         return { title, collection };
     }
@@ -58,6 +57,7 @@ export async function updateImage(data: any): Promise<any> {
 
 export async function uploadImage(image: any): Promise<any> {
     var { url, title, collection } = await uploadToStorage(image);
+
     addImageToDb({url: url, title: title, collection: collection,Style : image.style});
     return {
         url,
@@ -81,11 +81,14 @@ async function uploadToStorage(image: any) {
 }
 
  async function addImageToDb(imageData: any) {
+
+    const index = await getDataByCollectionName(imageData.collection).then((data) => data.length);
      const imageDTO ={
             url: imageData.url,
             likes: 0,
             title: imageData.title,
             Style : imageData.Style,
+            index: index,
             createDate: new Date().toISOString()
      }
     await add(imageDTO, imageData.collection);
@@ -96,7 +99,6 @@ export async function saveImagesLayout(images: any[]): Promise<any> {
     images.forEach(async (image) => {
         await updateDocById(image.id, image);
     });
-    // updateCacheWithUpdatedArrayData(images);
 }
 
 export async function likeImage(imageId: string): Promise<any> {
