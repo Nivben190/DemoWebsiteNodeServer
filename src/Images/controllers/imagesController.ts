@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import {uploadImage ,deleteImage, likeImage, getLazyLoadingImages, getImagesBySection, updateImage} from '../services/imagesService';
+import {uploadImage ,deleteImage, likeImage, getLazyLoadingImages, getImagesBySection, updateImage, saveImagesLayout} from '../services/imagesService';
 
 export class ImagesController {
     
@@ -16,12 +16,23 @@ export class ImagesController {
             return ;
         }
     }
+
+    public async saveImagesLayout(req: Request, res: Response): Promise<void> {
+        try {
+            const images = req.body;
+            
+            await saveImagesLayout(images);
+            res.status(200).json(true);
+        } catch (error) {
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
     
     public async getLazyLoadingImages(req: Request, res: Response): Promise<any> {
         try {
             
-            const images = await getLazyLoadingImages(req.body);
-            return images;
+            const imagesArg = await getLazyLoadingImages(req.body);
+            return imagesArg;
         } catch (error) {
             res.status(500).json({ error: 'Internal server error' });
         }

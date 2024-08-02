@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteImage = exports.likeImage = exports.uploadImage = exports.updateImage = exports.getLazyLoadingImages = exports.getImagesBySection = void 0;
+exports.deleteImage = exports.likeImage = exports.saveImagesLayout = exports.uploadImage = exports.updateImage = exports.getLazyLoadingImages = exports.getImagesBySection = void 0;
 const storage_1 = require("firebase/storage"); // Corrected import for getStorage
 const firebase_1 = require("../../DataAccess/firebase");
 const firebase_2 = require("../../DataAccess/firebase");
@@ -20,7 +20,7 @@ const fireBase = (0, app_1.initializeApp)(firebase_1.firebaseConfig); // Correct
 });
 const storage = (0, storage_1.getStorage)();
 async function getImagesBySection(section) {
-    return await (0, firebase_1.getImagesByCollectionName)(section);
+    return await (0, firebase_1.getDataByCollectionName)(section);
 }
 exports.getImagesBySection = getImagesBySection;
 async function getLazyLoadingImages(lazyLoadingArgs) {
@@ -32,15 +32,18 @@ async function updateImage(data) {
     var title = data.title;
     var collection = data.collection;
     var imageId = data.imageId;
+    var style = data.style;
     try {
         if (file) {
-            (0, firebase_1.deleteImageById)(imageId, collection);
+            (0, firebase_1.deleteDocById)(imageId, collection);
             var { url, title, collection } = await uploadToStorage(data);
-            await (0, firebase_4.updateImageById)(imageId, { url: url, title: title, collection: collection });
+            await (0, firebase_4.updateDocById)(imageId, { url: url, title: title, collection: collection, Style: style });
+            // updateCacheWithNewData({url: url, title: title, collection: collection,Style : style});
             return { url, title, collection };
         }
         else {
-            await (0, firebase_4.updateImageById)(imageId, { title: title, collection: collection });
+            await (0, firebase_4.updateDocById)(imageId, { title: title, collection: collection, Style: style });
+            // updateCacheWithNewData({ title: title, collection: collection,Style : style,id:imageId});
             return { title, collection };
         }
         return;
@@ -52,11 +55,12 @@ async function updateImage(data) {
 exports.updateImage = updateImage;
 async function uploadImage(image) {
     var { url, title, collection } = await uploadToStorage(image);
-    addImageToDb({ url: url, title: title, collection: collection });
+    addImageToDb({ url: url, title: title, collection: collection, Style: image.style });
     return {
         url,
         title,
-        collection
+        collection,
+        createDate: new Date().toISOString()
     };
 }
 exports.uploadImage = uploadImage;
@@ -77,17 +81,27 @@ async function addImageToDb(imageData) {
     const imageDTO = {
         url: imageData.url,
         likes: 0,
-        title: imageData.title
+        title: imageData.title,
+        Style: imageData.Style,
+        createDate: new Date().toISOString()
     };
     await (0, firebase_3.add)(imageDTO, imageData.collection);
     return;
 }
+async function saveImagesLayout(images) {
+    images.forEach(async (image) => {
+        await (0, firebase_4.updateDocById)(image.id, image);
+    });
+    // updateCacheWithUpdatedArrayData(images);
+}
+exports.saveImagesLayout = saveImagesLayout;
 async function likeImage(imageId) {
     await (0, firebase_2.likeImageById)(imageId);
 }
 exports.likeImage = likeImage;
 async function deleteImage(imageId, collection) {
-    await (0, firebase_1.deleteImageById)(imageId, collection);
+    await (0, firebase_1.deleteDocById)(imageId, collection);
+    // deleteFromCache(imageId);
     return;
 }
 exports.deleteImage = deleteImage;

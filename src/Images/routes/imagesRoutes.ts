@@ -219,5 +219,43 @@ router.put('/update', upload.single('image'), async (req: Request, res: Response
     }
 });
 
+/**
+ * @swagger
+ * /updateLayout:
+ *   put:
+ *     summary: Save images layout
+ *     description: Save images layout.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     index:
+ *                       type: number
+ *                     id:
+ *                       type: string
+ *                     collection:
+ *                       type: string
+ *     responses:
+ *       200:
+ *         description: Images layout saved
+ *       500:
+ *         description: Internal server error
+ */
+
+router.put('/updateLayout', async (req: Request, res: Response) => {
+    try {
+        await imagesController.saveImagesLayout(req, res);
+    } catch (error) {
+    }
+}
+);
 
 export default router;

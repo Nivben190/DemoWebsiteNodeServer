@@ -16,10 +16,20 @@ class ImagesController {
             return;
         }
     }
+    async saveImagesLayout(req, res) {
+        try {
+            const images = req.body;
+            await (0, imagesService_1.saveImagesLayout)(images);
+            res.status(200).json(true);
+        }
+        catch (error) {
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
     async getLazyLoadingImages(req, res) {
         try {
-            const images = await (0, imagesService_1.getLazyLoadingImages)(req.body);
-            return images;
+            const imagesArg = await (0, imagesService_1.getLazyLoadingImages)(req.body);
+            return imagesArg;
         }
         catch (error) {
             res.status(500).json({ error: 'Internal server error' });

@@ -1,14 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getLazyLoadingImagesFromDb = exports.getImagesByCollectionName = exports.deleteImageById = exports.updateImageById = exports.likeImageById = exports.add = exports.firebaseConfig = void 0;
+exports.getLazyLoadingImagesFromDb = exports.getDataByCollectionName = exports.deleteDocById = exports.updateDocById = exports.likeImageById = exports.add = exports.firebaseConfig = void 0;
 // Import the functions you need from the SDKs you need
 const app_1 = require("firebase/app");
 const firestore_1 = require("firebase/firestore");
 const firestore_2 = require("firebase/firestore");
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 exports.firebaseConfig = {
     apiKey: "AIzaSyBVnn0AZ8IWdmtzZupoTPxxrMu1_lhVJB8",
     authDomain: "dianashimongallery.firebaseapp.com",
@@ -18,7 +14,6 @@ exports.firebaseConfig = {
     appId: "1:393221943549:web:a162cca3ef1bc695950e94",
     measurementId: "G-JQ5P7Q88S1"
 };
-// Initialize Firebase
 const app = (0, app_1.initializeApp)(exports.firebaseConfig);
 const db = (0, firestore_1.getFirestore)(app);
 async function add(data, collectionName) {
@@ -41,10 +36,11 @@ async function likeImageById(imageId) {
     }
 }
 exports.likeImageById = likeImageById;
-async function updateImageById(imageId, data) {
+async function updateDocById(docId, data) {
     try {
         var collection = data.collection;
-        const docRef = (0, firestore_2.doc)(db, collection, imageId);
+        delete data.collection;
+        const docRef = (0, firestore_2.doc)(db, collection, docId);
         await (0, firestore_2.setDoc)(docRef, data, { merge: true });
         return `Document updated with ID: ${docRef.id}`;
     }
@@ -52,53 +48,61 @@ async function updateImageById(imageId, data) {
         return "Error updating document: " + e;
     }
 }
-exports.updateImageById = updateImageById;
-async function deleteImageById(imageId, collection) {
+exports.updateDocById = updateDocById;
+async function deleteDocById(id, collection) {
     try {
-        const docRef = (0, firestore_2.doc)(db, collection, imageId);
+        const docRef = (0, firestore_2.doc)(db, collection, id);
         await (0, firestore_1.deleteDoc)(docRef);
     }
     catch (e) {
         return "Error deleting document: " + e;
     }
 }
-exports.deleteImageById = deleteImageById;
-async function getImagesByCollectionName(collectionName) {
+exports.deleteDocById = deleteDocById;
+async function getDataByCollectionName(collectionName) {
     try {
         const querySnapshot = await (0, firestore_1.getDocs)((0, firestore_1.collection)(db, collectionName));
-        const images = querySnapshot.docs.map((doc) => (Object.assign({ id: doc.id }, doc.data())));
-        return images;
+        const data = querySnapshot.docs.map((doc) => (Object.assign({ id: doc.id }, doc.data())));
+        return data;
     }
     catch (e) {
         return "Error getting documents: " + e;
     }
 }
-exports.getImagesByCollectionName = getImagesByCollectionName;
+exports.getDataByCollectionName = getDataByCollectionName;
 async function getLazyLoadingImagesFromDb(lastDoc, limitNumber) {
     let imagesQuery;
     let images = [];
+    // const cacheKey = `images:${lastDoc ? lastDoc.seconds : 'start'}:${limitNumber}`;
+    // var cachedData = await cacheMiddlewareForLazyLoading(cacheKey);
+    // if(cachedData){
+    //     console.log(`Cache hit for key ${cacheKey}`);
+    //     const cachedResult = JSON.parse(cachedData);
+    //     return { images: cachedResult.images, lastVisibleCreateDate: cachedResult.lastVisibleCreateDate };
+    // }
+    // console.log(`Cache miss for key ${cacheKey}`);
     if (lastDoc) {
-        lastDoc = new firestore_1.Timestamp(lastDoc.seconds, lastDoc.nanoseconds);
-        imagesQuery = (0, firestore_1.query)((0, firestore_1.collection)(db, 'gallery'), (0, firestore_1.orderBy)('createDate'), (0, firestore_1.startAfter)(lastDoc), (0, firestore_1.limit)(limitNumber));
+        imagesQuery = (0, firestore_1.query)((0, firestore_1.collection)(db, 'gallery'), (0, firestore_1.orderBy)('index'), (0, firestore_1.startAfter)(lastDoc), (0, firestore_1.limit)(limitNumber));
     }
     else {
-        imagesQuery = (0, firestore_1.query)((0, firestore_1.collection)(db, 'gallery'), (0, firestore_1.orderBy)('createDate'), (0, firestore_1.limit)(limitNumber));
+        imagesQuery = (0, firestore_1.query)((0, firestore_1.collection)(db, 'gallery'), (0, firestore_1.orderBy)('index'), (0, firestore_1.limit)(limitNumber));
     }
     try {
         const querySnapshot = await (0, firestore_1.getDocs)(imagesQuery);
         if (querySnapshot.empty) {
             console.log('No more  to retrieve.');
-            return { images, lastVisibleCreateDate: null };
+            return { images, lastVisibleIndex: null };
         }
         else {
             images = querySnapshot.docs.map((doc) => (Object.assign({ id: doc.id }, doc.data())));
         }
         const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
-        const lastVisibleCreateDate = lastVisible === null || lastVisible === void 0 ? void 0 : lastVisible.data().createDate;
-        return { images, lastVisibleCreateDate };
+        const lastVisibleIndex = lastVisible === null || lastVisible === void 0 ? void 0 : lastVisible.data().index;
+        // cacheImage(cacheKey, { images, lastVisibleCreateDate });
+        return { images, lastVisibleIndex };
     }
     catch (e) {
-        return { images, lastVisibleCreateDate: null };
+        return { images, lastVisibleIndex: null };
         console.log("Error getting documents: " + e);
     }
 }

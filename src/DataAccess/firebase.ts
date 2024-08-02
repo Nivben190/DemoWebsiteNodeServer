@@ -72,31 +72,31 @@ export async function getDataByCollectionName(collectionName: string): Promise<a
         return "Error getting documents: " + e;
     }
 }
-export async function getLazyLoadingImagesFromDb(lastDoc: any | null, limitNumber: number): Promise<{ images: any[], lastVisibleCreateDate: any }> {
+export async function getLazyLoadingImagesFromDb(lastDoc: any | null, limitNumber: number): Promise<{ images: any[], lastVisibleIndex: number | null }> {
     let imagesQuery;
     
     let images: any[] = [];
-    const cacheKey = `images:${lastDoc ? lastDoc.seconds : 'start'}:${limitNumber}`;
-    var cachedData = await cacheMiddlewareForLazyLoading(cacheKey);
-    if(cachedData){
-        console.log(`Cache hit for key ${cacheKey}`);
-        const cachedResult = JSON.parse(cachedData);
-        return { images: cachedResult.images, lastVisibleCreateDate: cachedResult.lastVisibleCreateDate };
-    }
-    console.log(`Cache miss for key ${cacheKey}`);
+    // const cacheKey = `images:${lastDoc ? lastDoc.seconds : 'start'}:${limitNumber}`;
+    // var cachedData = await cacheMiddlewareForLazyLoading(cacheKey);
+    // if(cachedData){
+    //     console.log(`Cache hit for key ${cacheKey}`);
+    //     const cachedResult = JSON.parse(cachedData);
+    //     return { images: cachedResult.images, lastVisibleCreateDate: cachedResult.lastVisibleCreateDate };
+    // }
+    // console.log(`Cache miss for key ${cacheKey}`);
 
+    
     if (lastDoc) {
-        lastDoc = new Timestamp(lastDoc.seconds, lastDoc.nanoseconds);
        imagesQuery = query(
             collection(db, 'gallery'),
-            orderBy('createDate'),
+            orderBy('index'),
             startAfter(lastDoc),
             limit(limitNumber)
         );
     } else {
         imagesQuery = query(
             collection(db, 'gallery'),
-            orderBy('createDate'),
+            orderBy('index'),
             limit(limitNumber)
         );
     }
@@ -104,7 +104,7 @@ export async function getLazyLoadingImagesFromDb(lastDoc: any | null, limitNumbe
         const querySnapshot = await getDocs(imagesQuery);
         if (querySnapshot.empty) {
             console.log('No more  to retrieve.');
-            return { images, lastVisibleCreateDate: null };
+            return { images, lastVisibleIndex: null };
         } else {
             images = querySnapshot.docs.map((doc) => ({
                 id: doc.id,
@@ -113,13 +113,13 @@ export async function getLazyLoadingImagesFromDb(lastDoc: any | null, limitNumbe
         }
     
         const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
-        const lastVisibleCreateDate = lastVisible?.data().createDate ;
-        cacheImage(cacheKey, { images, lastVisibleCreateDate });
+        const lastVisibleIndex = lastVisible?.data().index ;
+        // cacheImage(cacheKey, { images, lastVisibleCreateDate });
 
-        return { images, lastVisibleCreateDate };
+        return { images, lastVisibleIndex };
     }
     catch(e){
-        return { images, lastVisibleCreateDate: null };
+        return { images, lastVisibleIndex: null };
         console.log("Error getting documents: " + e);
     }
  

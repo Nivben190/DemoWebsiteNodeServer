@@ -51,10 +51,29 @@ export async function deleteFromCache(id:string) {
 }
 
 
-export async function updateCacheWithNewData(newData:any) {
+export async function updateCacheWithUpdatedArrayData(updatedData: any []) {
+    const keys = await client.keys('images:*');
+    keys.forEach(async key => {
+        const cachedData = await client.get(key);
+        if (cachedData) {
+            const cachedResult = JSON.parse(cachedData);
+            updatedData.forEach(newData => {
+                const index = cachedResult.images.findIndex((image: { id: any; }) => image.id === newData.id);
+                if (index !== -1) {
+                    cachedResult.images[index] = newData;
+                }
+            });
+            client.set(key, JSON.stringify(cachedResult));
+        }
+    });
+   
+}
+
+
+export async function updateCacheWithNewData(newData: any) {
     const keys = await client.keys('images:*');
     
-    keys.forEach(async key => {
+    await Promise.all(keys.map(async key => {
         const cachedData = await client.get(key);
         
         if (cachedData) {
@@ -62,15 +81,31 @@ export async function updateCacheWithNewData(newData:any) {
             const index = cachedResult.images.findIndex((image: { id: any; }) => image.id === newData.id);
             
             if (index !== -1) {
+                console.log(`Updating image ${newData.title} with old index ${cachedResult.images[index].index} to new index ${newData.index}`);
+                
                 cachedResult.images[index] = {
                     ...cachedResult.images[index],
                     title: newData.title,
-                    Style : newData.Style
+                    Style: newData.Style,
+                    index: newData.index
                 };
-                client.set(key, JSON.stringify(cachedResult));
+                
+                await new Promise((resolve, reject) => {
+                    client.set(key, JSON.stringify(cachedResult), (err, reply) => {
+                        if (err) {
+                            console.error('Error setting cache:', err);
+                            reject(err);
+                        } else {
+                            console.log('Cache set successfully:', reply);
+                            resolve(reply);
+                        }
+                    });
+                });
             }
         }
-    });
+    }));
+    
+    console.log('All cache updates completed.');
 }
     
 

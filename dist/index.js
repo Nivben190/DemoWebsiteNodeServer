@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
+const filtersRoute_1 = __importDefault(require("./filters/routes/filtersRoute"));
 const userRoutes_1 = __importDefault(require("./Users/routes/userRoutes"));
 const imagesRoutes_1 = __importDefault(require("./Images/routes/imagesRoutes"));
 const swaggerUi = require('swagger-ui-express');
@@ -20,6 +21,7 @@ app.get('/checkConnection', (req, res) => {
 });
 app.use('/images', imagesRoutes_1.default);
 app.use('/users', userRoutes_1.default);
+app.use('/filters', filtersRoute_1.default);
 async function startServer() {
     try {
         app.listen(port, () => {
